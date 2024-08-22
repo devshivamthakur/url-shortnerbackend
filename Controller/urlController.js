@@ -1,10 +1,9 @@
+const Joi = require("joi")
 const ApiError = require("../MiddleWare/Apierrors")
-const validation = require("../MiddleWare/handleValidation")
 const urlInfoModal = require("../Modals/urlInfo.modal")
 const nanoid = require("nanoid").nanoid
 const getUrlAnalytics = async (req, res, next) => {
     try {
-        validation(req.params.shortId, 'shortId')
         const result = await getUrlAnalyticInfo(req.params.shortId)
 
        res.json({
@@ -40,7 +39,13 @@ const getUrlAnalyticInfo = async (shortId) => {
 
 const addUrlShortener = async (req, res, next) => {
     try {
-        const validateRequest = validation(req.body.uri, "weburl")
+        const schema = Joi.object({
+            uri: Joi.string().uri().required()
+        })
+        const {error} = schema.validate(req.body)
+        if(error) {
+            throw new ApiError(400,error.message)
+        }
 
         const result = await saveUrlShortener(req.body.uri)
         res.json({
@@ -72,7 +77,15 @@ const saveUrlShortener = async (uri) => {
 
 const redirectToUrl = async (req, res, next) => {
     try {
-        validation(req.params.shortId, 'shortId')
+        const joiSchema = Joi.object({
+            shortId: Joi.string().min(10).max(10).required()
+        })
+        const {error} = joiSchema.validate(req.params)
+        
+        if(error) {
+            console.log(error.message)
+            throw new ApiError(400, error.message)
+        }
 
         const result = await urlInfoModal.findOneAndUpdate({ shortId: req.params.shortId }, {
             $push: {
@@ -97,9 +110,7 @@ const redirectToUrl = async (req, res, next) => {
             data: result
         })
     } catch (error) {
-        res.status(400).json({
-            message: "invalid shortId " + req.params.shortId
-        })
+       next(error)
     }
 }
 
