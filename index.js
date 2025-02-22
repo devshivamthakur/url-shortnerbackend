@@ -1,14 +1,18 @@
 const express = require("express")
-const cors = require("cors"); // Add this line
+const cors = require("cors");
 const ApiError = require("./MiddleWare/Apierrors")
 const connectDb = require("./Db/db")
 require("dotenv").config()
 const {router, redirectRoute} = require("./Routes/urlInforoutes")
-const bodyParser = require("body-parser")
 
 const app = express()
 
-app.use(cors()); // Use CORS middleware
+// Configure CORS with specific origin
+app.use(cors({
+  origin: 'https://shortnerurl.github.io',
+  credentials: true
+}));
+
 app.use(express.json())
 
 
