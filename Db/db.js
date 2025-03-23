@@ -11,7 +11,9 @@ const connectDb = async()=>{
        return 'connected'
         
     } catch (error) {
-        
+        console.log(error, 'Error in connecting to db', process.env.DB_URL, process.env.DB_NAME)
+        throw new Error('Error in connecting to db')
+
     }
 }
 

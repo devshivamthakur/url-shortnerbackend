@@ -16,9 +16,12 @@ app.use(cors({
 app.use(express.json())
 
 
-connectDb()
-app.listen(process.env.PORT || 5000,()=>{
-console.log("listening on port",process.env.PORT || 5000)
+connectDb().then(()=>{
+  console.log("connected to db")
+
+  app.listen(process.env.PORT || 5000,()=>{
+  console.log("listening on port",process.env.PORT || 5000)
+  })
 })
 
 app.use("/url-shortener",router)
