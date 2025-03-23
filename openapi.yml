@@ -1,0 +1,147 @@
+openapi: 3.0.3
+info:
+  title: URL Shortener API
+  description: >-
+    This is an API specification for a URL shortener service.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+externalDocs:
+  description: Documentation
+  url: https://example.com/docs
+servers:
+  - url: http://localhost:8080
+tags:
+  - name: urls
+    description: URL shortener API
+paths:
+  /urls:
+    summary: List all shortened URLs
+    get:
+      summary: List all shortened URLs
+      operationId: ListAllURLs
+      tags:
+        - urls
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/URLArray"
+    post:
+      summary: Shorten a new URL
+      operationId: ShortenURL
+      responses:
+        "200":
+          description: Successful operation
+        "400":
+          description: Invalid request body
+      tags:
+        - urls
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/URLRequest"
+
+  /urls/{id}:
+    summary: Get URL by ID
+    get:
+      tags:
+        - urls
+      summary: Get URL by ID
+      operationId: GetURLByID
+      parameters:
+        - name: id
+          in: path
+          description: ID of URL to return
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/URLResponse"
+        "404":
+          description: ID not found
+    delete:
+      tags:
+        - urls
+      summary: Delete URL by ID
+      description: Deletes a single URL based on the ID supplied
+      operationId: DeleteURLByID
+      parameters:
+        - name: id
+          in: path
+          description: ID of URL to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
+        "404":
+          description: ID not found
+    put:
+      tags:
+        - urls
+      summary: Update URL by ID
+      description: Updates the URL based on the ID supplied
+      operationId: UpdateURLByID
+      parameters:
+        - name: id
+          in: path
+          description: ID of URL to update
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
+        "404":
+          description: ID not found
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/URLRequest"
+  /healthz:
+    summary: Healthcheck endpoint
+    get:
+      summary: Healthcheck
+      operationId: Healthcheck
+      responses:
+        "200":
+          description: Healthy response
+
+components:
+  schemas:
+    URLRequest:
+      type: object
+      required:
+        - url
+      properties:
+        url:
+          type: string
+          example: "https://example.com"
+    URLResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "abc123"
+        url:
+          type: string
+          example: "https://example.com"
+        shortUrl:
+          type: string
+          example: "http://short.url/abc123"
+    URLArray:
+      type: array
+      items:
+        $ref: "#/components/schemas/URLResponse"
